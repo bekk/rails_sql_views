@@ -46,6 +46,7 @@ require 'rails_sql_views/connection_adapters/mysql_adapter'
 require 'rails_sql_views/connection_adapters/postgresql_adapter'
 require 'rails_sql_views/connection_adapters/sqlserver_adapter'
 require 'rails_sql_views/connection_adapters/sqlite_adapter'
+require 'rails_sql_views/connection_adapters/jdbc_adapter'
 require 'rails_sql_views/schema_dumper'
 
 class ActiveRecord::ConnectionAdapters::AbstractAdapter

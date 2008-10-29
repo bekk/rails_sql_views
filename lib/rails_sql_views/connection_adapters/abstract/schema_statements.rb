@@ -9,9 +9,10 @@ module RailsSqlViews
       #   values: CASCADED and LOCAL. See your database documentation for allowed values.
       def create_view(name, select_query, options={})
         if supports_views?
+          raise "JRuby not supported in create_view yet" if defined?(JRUBY_VERSION)
           view_definition = ViewDefinition.new(self, select_query)
 
-          yield view_definition
+          yield view_definition if block_given?
 
           if options[:force]
             drop_view(name) rescue nil
@@ -19,7 +20,7 @@ module RailsSqlViews
 
           create_sql = "CREATE VIEW "
           create_sql << "#{name} "
-          if supports_view_columns_definition?
+          if supports_view_columns_definition? && !view_definition.to_sql.blank?
             create_sql << "("
             create_sql << view_definition.to_sql
             create_sql << ") " 
@@ -27,6 +28,8 @@ module RailsSqlViews
           create_sql << "AS #{view_definition.select_query}"
           create_sql << " WITH #{options[:check_option]} CHECK OPTION" if options[:check_option]
           execute create_sql
+        else
+          STDERR.puts "Views not supported for #{self.class}. Not creating #{name}"
         end
       end
 
@@ -60,6 +63,7 @@ module RailsSqlViews
       #   database documentation to determine what drop behaviors are available.
       def drop_view(name, options={})
         if supports_views?
+          raise "JRuby not supported in drop_view yet" if defined?(JRUBY_VERSION)
           drop_sql = "DROP VIEW #{name}"
           drop_sql << " #{options[:drop_behavior]}" if options[:drop_behavior]
           execute drop_sql
