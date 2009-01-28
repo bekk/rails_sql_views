@@ -1,6 +1,7 @@
 module ActiveRecord
   module ConnectionAdapters
     class SQLServerAdapter
+      
       # Returns true as this adapter supports views.
       def supports_views?
         true
@@ -14,9 +15,13 @@ module ActiveRecord
       
       # Returns all the view names from the currently connected schema.
       def views(name = nil)
-        select_values("SELECT table_name FROM information_schema.views", name)
+        select_values(list_views_statement, name)
       end
       
+      def list_views_statement
+        "SELECT table_name FROM information_schema.views"
+      end
+    
       # Get the view select statement for the specified view.
       def view_select_statement(view, name=nil)
         q =<<-ENDSQL
