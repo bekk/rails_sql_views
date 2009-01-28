@@ -6,8 +6,10 @@ module ActiveRecord
         true
       end
       
+      # Get all of the non-view tables from the currently connected schema
       def nonview_tables(name = nil)
-        tables(name)
+        # this is untested
+        select_values("SELECT table_name FROM information_schema.tables", name)
       end
       
       # Returns all the view names from the currently connected schema.

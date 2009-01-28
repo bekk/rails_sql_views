@@ -16,3 +16,7 @@
 0.6.1 - Released June 6, 2007
  * Added test for union support
  * Updated tests to include new table to support union test
+
+0.7.0
+ * Updated dependency versions to get on ActiveRecord 2.x. May not be compatible with Rails versions less than 2.x.
+ * Add nonview_tables support to *all* of the adapters (was missing from Postgres and SQLServer)
