@@ -1,6 +1,6 @@
-module ActiveRecord
+module RailsSqlViews
   module ConnectionAdapters
-    class SQLiteAdapter
+    module SQLiteAdapter
       def supports_views?
         true
       end
@@ -17,7 +17,7 @@ module ActiveRecord
         end
       end
 
-      def nonview_tables(name = nil)
+      def base_tables(name = nil)
         sql = <<-SQL
           SELECT name
           FROM sqlite_master
@@ -28,6 +28,7 @@ module ActiveRecord
           row[0]
         end        
       end
+      alias nonview_tables base_tables
       
       def views(name = nil)
         sql = <<-SQL
@@ -49,7 +50,7 @@ module ActiveRecord
           WHERE name = '#{view}' AND NOT name = 'sqlite_sequence'
         SQL
         
-        select_value(sql, name) or raise "No view called #{view} found"
+        (select_value(sql, name).gsub("CREATE VIEW #{view} AS ", "")) or raise "No view called #{view} found"
       end
       
       def supports_view_columns_definition?

@@ -1,26 +1,37 @@
-module ActiveRecord
+module RailsSqlViews
   module ConnectionAdapters
-    class MysqlAdapter
+    module MysqlAdapter
+      def self.included(base)
+        if base.private_method_defined?(:supports_views?)
+          base.send(:public, :supports_views?)
+        end
+      end
+
       # Returns true as this adapter supports views.
       def supports_views?
         true
       end
       
-      def nonview_tables(name = nil) #:nodoc:
+      def base_tables(name = nil) #:nodoc:
         tables = []
         execute("SHOW FULL TABLES WHERE TABLE_TYPE='BASE TABLE'").each{|row| tables << row[0]}
         tables
       end
+      alias nonview_tables base_tables
       
       def views(name = nil) #:nodoc:
         views = []
         execute("SHOW FULL TABLES WHERE TABLE_TYPE='VIEW'").each{|row| views << row[0]}
         views
       end
+
+      def tables_with_views_included(name = nil)
+        nonview_tables(name) + views(name)
+      end
       
       def structure_dump
         structure = ""
-        nonview_tables.each do |table|
+        base_tables.each do |table|
           structure += select_one("SHOW CREATE TABLE #{quote_table_name(table)}")["Create Table"] + ";\n\n"
         end
 

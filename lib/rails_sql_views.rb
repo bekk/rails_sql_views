@@ -22,8 +22,7 @@
 #++
 
 $:.unshift(File.dirname(__FILE__))
-  
-require 'rubygems'
+
 require 'active_record'
 
 require 'core_ext/module'
@@ -31,13 +30,18 @@ require 'core_ext/module'
 require 'rails_sql_views/connection_adapters/abstract/schema_definitions'
 require 'rails_sql_views/connection_adapters/abstract/schema_statements'
 require 'rails_sql_views/connection_adapters/abstract_adapter'
-require 'rails_sql_views/connection_adapters/mysql_adapter'
-require 'rails_sql_views/connection_adapters/postgresql_adapter'
-require 'rails_sql_views/connection_adapters/sqlserver_adapter'
-require 'rails_sql_views/connection_adapters/sqlite_adapter'
-require 'rails_sql_views/connection_adapters/jdbc_adapter'
 require 'rails_sql_views/schema_dumper'
+require 'rails_sql_views/loader'
 
-class ActiveRecord::ConnectionAdapters::AbstractAdapter
+ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
   include RailsSqlViews::ConnectionAdapters::SchemaStatements
+  def self.inherited(sub)
+    RailsSqlViews::Loader.load_extensions
+  end
 end
+
+ActiveRecord::SchemaDumper.class_eval do
+  include RailsSqlViews::SchemaDumper
+end
+
+RailsSqlViews::Loader.load_extensions
